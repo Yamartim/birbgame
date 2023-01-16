@@ -4,7 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class UIGame : MonoBehaviour
+
+public class UIGame : UIManager
 {
 
 
@@ -66,13 +67,13 @@ public class UIGame : MonoBehaviour
 
     void UpdateTimer()
     {
-        timerdisplay.text = gm.FloatTimeToString(Time.timeSinceLevelLoad);
+        timerdisplay.text = FloatTimeToString(Time.timeSinceLevelLoad);
     }
 
     public void ShowEndPanel(bool newrecord)
     {
         endpanel.SetActive(true);
-        resulttext.text = $"You reached the top in {gm.FloatTimeToString(Time.timeSinceLevelLoad)}";
+        resulttext.text = $"You reached the top in {FloatTimeToString(Time.timeSinceLevelLoad)}";
 
         if(newrecord){
             resulttext.text += "\nNEW RECORD";

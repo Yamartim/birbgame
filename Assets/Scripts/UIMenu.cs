@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
-public class UIMenu : MonoBehaviour
+public class UIMenu : UIManager
 {
 
     [SerializeField]
@@ -24,7 +24,7 @@ public class UIMenu : MonoBehaviour
 
 
         if (gm.gamecleared) {
-            besttime.text = "Your best time is: " + gm.GetBestTimeStr();
+            besttime.text = "Your best time is: " + FloatTimeToString(gm.besttime);
         } else {
             besttime.text = "";
         }

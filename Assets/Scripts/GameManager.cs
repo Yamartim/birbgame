@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
 
-    private float besttime;
+    public float besttime { get; private set;}
     public bool gamecleared { get; private set;} = false;
 
     public static GameManager Instance { get; private set; }
@@ -69,20 +69,6 @@ public class GameManager : MonoBehaviour
 
     }
 
-    public string GetBestTimeStr()
-    {
-        return FloatTimeToString(PlayerPrefs.GetFloat("BestTime"));        
-    }
-
-    public string FloatTimeToString(float time)
-    {
-        string minutes, seconds;
-
-        minutes = Mathf.FloorToInt(time / 60).ToString();
-        seconds = Mathf.FloorToInt(time % 60).ToString();
-
-        return $"{minutes}:{seconds}";
-    }
 
     
     public void DeathTransition()
