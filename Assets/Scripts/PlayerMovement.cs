@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-
     private Rigidbody rb;
     private PlayerStats stats;
     private PlayerAnimation anim;
@@ -14,7 +13,9 @@ public class PlayerMovement : MonoBehaviour
     private float movespeed = 10.0f;
 
     [SerializeField]
-    private float rotatespeed = 100.0f;
+    private float rotatespeed = 10.0f;
+    [SerializeField]
+    private float rotationlimit = .6f;
     [SerializeField]
     private float jumpheight = 10.0f;
 
@@ -26,8 +27,10 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 movedirection, camerarelative;
     private int midairjumps = 5;
 
-    private bool canjump;
-    private bool canmidairjump;
+    public bool ispaused { get; private set;} = false;
+    [SerializeField] 
+    private GameObject pausemenu;
+
 
     [SerializeField] private Transform LevelStart;
     [SerializeField] private Camera cam;
@@ -48,15 +51,22 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
-        rb.velocity = ProcessMovement();
-
-        if(rb.velocity.y < 0)
+        if(Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.P))
+            TogglePause();
+        
+        if(!ispaused)
         {
-            rb.velocity += Vector3.up * Physics.gravity.y * (fallMultiplier - 1) * Time.deltaTime;
-        }else if(rb.velocity.y > 0 && !Input.GetButton("Jump"))
-        {
-            rb.velocity += Vector3.up * Physics.gravity.y * (lowJumpMultiplier - 1) * Time.deltaTime;
+            rb.velocity = ProcessMovement();
+
+            if(rb.velocity.y < 0){
+
+                rb.velocity += Vector3.up * Physics.gravity.y * (fallMultiplier - 1) * Time.deltaTime;
+
+            } else if(rb.velocity.y > 0 && !Input.GetButton("Jump")){
+
+                rb.velocity += Vector3.up * Physics.gravity.y * (lowJumpMultiplier - 1) * Time.deltaTime;
+
+            }
         }
 
     }
@@ -72,8 +82,8 @@ public class PlayerMovement : MonoBehaviour
 
     private Vector3 ProcessMovement()
     {
-        canjump = Input.GetButtonDown("Jump") && ground.IsGrounded();
-        canmidairjump = Input.GetButtonDown("Jump") && !ground.IsGrounded() && midairjumps > 0;
+        bool willjump = Input.GetButtonDown("Jump") && ground.IsGrounded();
+        bool willmidairjump = Input.GetButtonDown("Jump") && !ground.IsGrounded() && midairjumps > 0;
         
         //movedirection = new Vector3(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical")).normalized * movespeed + Vector3.up * rb.velocity.y;
         camerarelative = Input.GetAxis("Horizontal") * cam.transform.right + Input.GetAxis("Vertical") * cam.transform.forward;
@@ -81,33 +91,36 @@ public class PlayerMovement : MonoBehaviour
     
         ProcessRotation(movedirection);
 
-        if (canjump)
-        {
+        if (willjump){
             movedirection.y += jumpheight;
+            anim.JumpAnim();
 
-        }else if (canmidairjump)
-        {
+        } else if (willmidairjump){
             movedirection.y += jumpheight;
             midairjumps --;
+            anim.JumpAnim();
         }
-
 
         return movedirection;
     }
 
     private void ProcessRotation(Vector3 dir)
     {
-        if (dir != Vector3.zero)
-        {
+        dir.y *= rotationlimit;
+
+        if ((dir.x != 0f || dir.z != 0f) && dir != Vector3.zero){
             Quaternion angle = Quaternion.LookRotation(dir, Vector3.up);
-            rb.MoveRotation(angle);
+
+            Quaternion angvelocity = Quaternion.Euler(Vector3.up*rotatespeed*Time.deltaTime);
+
+            rb.MoveRotation(angle*angvelocity);
             
         }
     }
 
     private void ReplenishJumps()
     {
-        midairjumps = stats.GetCoinTotal();
+        midairjumps = stats.coinscollected;
     }
 
     public void ResetPlayer()
@@ -118,6 +131,19 @@ public class PlayerMovement : MonoBehaviour
 
         transform.position = LevelStart.position;
 
+    }
+
+    public void TogglePause()
+    {
+        if (Time.timeScale > 0) {
+            Time.timeScale = 0;
+            ispaused = true;
+            pausemenu.SetActive(false);
+        } else if(Time.timeScale == 0) {
+            Time.timeScale = 1;
+            ispaused = false;
+            pausemenu.SetActive(true);
+        }
     }
 
 

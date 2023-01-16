@@ -1,10 +1,13 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+
+    private float besttime;
+    public bool gamecleared { get; private set;} = false;
 
     public static GameManager Instance { get; private set; }
 
@@ -22,25 +25,98 @@ public class GameManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
+/* 
+    private void OnEnable() {
+        CoinScript.OnCoinCollect += SaveCoins;
+    }
+    private void OnDisable() {
+        CoinScript.OnCoinCollect -= SaveCoins;
+    }
+ */
+
+
+    public void LoadGame()
+    {
+        SceneManager.LoadScene(1);
+    }
+
+    public void LoadMenu()
+    {
+        SceneManager.LoadScene(0);
+    }
+
+
+    public bool SetBestTime()
+    {
+        float cleartime = Time.timeSinceLevelLoad;
+
+        if(!gamecleared)
+        {
+            gamecleared = true;
+            besttime = cleartime;
+            PlayerPrefs.SetFloat("BestTime", cleartime);
+
+            return true;
+
+        } else if (cleartime < PlayerPrefs.GetFloat("BestTime")){
+
+            PlayerPrefs.SetFloat("BestTime", cleartime);
+            return true;
+
+        } else {
+            return false;
+        }
+
+    }
+
+    public string GetBestTimeStr()
+    {
+        return FloatTimeToString(PlayerPrefs.GetFloat("BestTime"));        
+    }
+
+    public string FloatTimeToString(float time)
+    {
+        string minutes, seconds;
+
+        minutes = Mathf.FloorToInt(time / 60).ToString();
+        seconds = Mathf.FloorToInt(time % 60).ToString();
+
+        return $"{minutes}:{seconds}";
+    }
+
+    
     public void DeathTransition()
     {
-        throw new NotImplementedException();
+        Debug.Log("transition into reset");
     }
 
-    public void SaveCoin(int id)
-    {
-        throw new NotImplementedException();
-    }
 
-    // Start is called before the first frame update
-    void Start()
+    void SaveCoins()
     {
+        CoinManager cm = null; //FindObjectOfType<CoinManager>();
+        CoinScript[] coins = cm.coinsinscene;
+        int total = cm.cointotal;
+
+        bool[] coinstracker = new bool[total];
+
+        for (int i = 0; i < total; i++)
+        {
+            if(coins[i].gameObject.activeInHierarchy) {
+                coinstracker[i] = true;
+            } else {
+                coinstracker[i] = false;
+            }
+        }
+
+        BitArray bits = new BitArray(coinstracker);
         
+        int[] binconversion = new int[1];
+        bits.CopyTo(binconversion, 0);
+
+        PlayerPrefs.SetInt("CoinsCollected", binconversion[0]);
+
+        //I wont go into implementing loading as this is already quite out of scope, but this is a very optimal way of storing data such as collectables obtained
+
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

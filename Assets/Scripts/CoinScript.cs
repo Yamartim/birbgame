@@ -3,25 +3,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CoinScript : MonoBehaviour
+public class CoinScript : MonoBehaviour, ICollectable
 {
+    // [SerializeField] Animator anim;
 
-    public int coinid = -1;
+    public static event Action OnCoinCollect;
 
     private void OnTriggerEnter(Collider other) {
         if (other.CompareTag("Player"))
         {
-            other.GetComponent<PlayerStats>().AddCoin();
-
-            GameManager.Instance.SaveCoin(coinid);
-
             Collect();
         }
     }
-    private void Collect()
+    public void Collect()
     {
+        gameObject.SetActive(false);
+        OnCoinCollect?.Invoke();
         //release particles and some sfx
-        Destroy(gameObject);
     }
 
 }
