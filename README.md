@@ -26,7 +26,7 @@ And Last but not least the final inspiration was also from nintendo: Super Mario
 
 After that and some more consideration I was able to narrow down what sort of game would be ideal for this assignment:
 
- - The game will be a 3D plarformer with a focus on exploration, this genre is loved for being generally both very accessible but also offering a lot of enjoyment
+ - The game will be a 3D plarformer with a focus on exploration, this genre is loved for being generally both very accessible but also offering a lot of enjoyment and is also decently niche nowdays so it'll stand out as not many people make them.
  - the game will only have two inputs: one movement input and a jump input so that it'll be easy to understand and won't leave people who don't play games often overwhelmed
  - the game will need a very tangible sense of progression to keep players engaged and interesting
  - the game will have a main objective but there's no harm in players ignoring it and doing what they find fun 
@@ -39,6 +39,26 @@ From this point it all came very fluidly and just fit pretty well with my origin
 (pretty class diagram of the project goes here when it's ready)
 
 ### Main objects
+
+#### Player character
+
+##### Movement
+
+##### Wing System
+
+#### Interactables
+
+##### Coins
+
+##### The Nest
+
+##### Bottomless Pits
+
+#### UI
+
+##### Time Trial Feature
+
+##### CoinBar Display
 
 ### Unity features and design patterns
 
