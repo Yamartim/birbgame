@@ -7,10 +7,10 @@ public class UIMenu : UIManager
 {
 
     [SerializeField]
-    private GameObject htppanel;
+    private GameObject htpPanel;
 
     [SerializeField]
-    private TMP_Text besttime;
+    private TMP_Text bestTime;
 
     private GameManager gm;
 
@@ -23,10 +23,10 @@ public class UIMenu : UIManager
         gm = GameManager.Instance;
 
 
-        if (gm.gamecleared) {
-            besttime.text = "Your best time is: " + FloatTimeToString(gm.besttime);
+        if (gm.gameCleared) {
+            bestTime.text = "Your best time is: " + FloatTimeToString(gm.bestTime);
         } else {
-            besttime.text = "";
+            bestTime.text = "";
         }
         
     }
@@ -38,12 +38,12 @@ public class UIMenu : UIManager
 
     public void ShowHTP()
     {
-        htppanel.SetActive(true);
+        htpPanel.SetActive(true);
     }
 
     public void HideHTP()
     {
-        htppanel.SetActive(false);
+        htpPanel.SetActive(false);
     }
 
     public void QuitGame()

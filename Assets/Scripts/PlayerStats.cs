@@ -27,7 +27,7 @@ public class PlayerStats : MonoBehaviour
     public void AddCoin()
     {
         coinscollected++;
-        wingscript.UpdateWings(coinscollected, cm.cointotal);
+        wingscript.UpdateWings(coinscollected, cm.coinTotal);
     }
 
 }

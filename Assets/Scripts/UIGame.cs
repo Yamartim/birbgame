@@ -10,12 +10,12 @@ public class UIGame : UIManager
 
 
     [SerializeField] private CoinManager cm;
-    [SerializeField] private GameObject coindisplay, coinprefab, pausepanel, endpanel, transitionobj; 
-    [SerializeField] private Image[] coinimgs;
+    [SerializeField] private GameObject coinDisplay, coinPrefab, pausePanel, endPanel, transitionObj; 
+    [SerializeField] private Image[] coinImgs;
 
     GameManager gm;
-    [SerializeField] private TMP_Text timerdisplay;
-    [SerializeField] private TMP_Text resulttext;
+    [SerializeField] private TMP_Text timerDisplay;
+    [SerializeField] private TMP_Text resultText;
 
     
 
@@ -31,21 +31,21 @@ public class UIGame : UIManager
     void Start()
     {
         gm = GameManager.Instance;
-        coinimgs = new Image[cm.cointotal];
+        coinImgs = new Image[cm.coinTotal];
 
 
         GameObject aux;
-        for (int i = 0; i<cm.cointotal; i++)
+        for (int i = 0; i<cm.coinTotal; i++)
         {
-            aux = Instantiate(coinprefab);
-            aux.transform.SetParent(coindisplay.transform);
-            coinimgs[i] = aux.GetComponent<Image>();
+            aux = Instantiate(coinPrefab);
+            aux.transform.SetParent(coinDisplay.transform);
+            coinImgs[i] = aux.GetComponent<Image>();
         }
         UpdateDisplay();
 
-        timerdisplay.text = "";
+        timerDisplay.text = "";
         
-        if(gm.gamecleared)
+        if(gm.gameCleared)
         {
             InvokeRepeating("UpdateTimer", 0f, 1f);
         }
@@ -55,34 +55,34 @@ public class UIGame : UIManager
 
     void UpdateDisplay()
     {
-        for (int i = 0; i<cm.cointotal; i++)
+        for (int i = 0; i<cm.coinTotal; i++)
         {
-            if(cm.coinsinscene[i].gameObject.activeInHierarchy){
-                coinimgs[i].color = Color.yellow;
+            if(cm.coinsInScene[i].gameObject.activeInHierarchy){
+                coinImgs[i].color = Color.yellow;
             } else {
-                coinimgs[i].color = Color.gray;
+                coinImgs[i].color = Color.gray;
             }
         } 
     }
 
     void UpdateTimer()
     {
-        timerdisplay.text = FloatTimeToString(Time.timeSinceLevelLoad);
+        timerDisplay.text = FloatTimeToString(Time.timeSinceLevelLoad);
     }
 
     public void ShowEndPanel(bool newrecord)
     {
-        endpanel.SetActive(true);
-        resulttext.text = $"You reached the top in {FloatTimeToString(Time.timeSinceLevelLoad)}";
+        endPanel.SetActive(true);
+        resultText.text = $"You reached the top in {FloatTimeToString(Time.timeSinceLevelLoad)}";
 
         if(newrecord){
-            resulttext.text += "\nNEW RECORD";
+            resultText.text += "\nNEW RECORD";
         }
     }
 
     public void DeathTransition()
     {
-        transitionobj.GetComponent<Animator>().SetTrigger("START");
+        transitionObj.GetComponent<Animator>().SetTrigger("START");
         //transitionobj.GetComponent<Animator>().SetTrigger("END");
     }
 

@@ -4,24 +4,24 @@ using UnityEngine;
 
 public class PlayerWings : MonoBehaviour
 {
-    [SerializeField] Transform wingobj;
-    List<GameObject> winglist;
+    [SerializeField] Transform wingObj;
+    List<GameObject> wingList;
 
     // Start is called before the first frame update
     void Start()
     {
-        winglist = new List<GameObject>();
-        foreach (Transform wingpair in wingobj)
+        wingList = new List<GameObject>();
+        foreach (Transform wingPair in wingObj)
         {
             //Debug.Log(wingpair.name);
-            winglist.Add(wingpair.gameObject);
+            wingList.Add(wingPair.gameObject);
         }
     }
 
     public void UpdateWings(int currentwings, int maxwings)
     {
         if(currentwings <= maxwings) {
-            winglist[currentwings].SetActive(true);
+            wingList[currentwings].SetActive(true);
         }
     }
 

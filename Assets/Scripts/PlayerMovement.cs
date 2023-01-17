@@ -10,29 +10,29 @@ public class PlayerMovement : MonoBehaviour
     private GroundCheck ground;
 
     [SerializeField]
-    private float movespeed = 10.0f;
+    private float moveSpeed = 10.0f;
 
     [SerializeField]
-    private float rotatespeed = 10.0f;
+    private float rotateSpeed = 10.0f;
     [SerializeField]
-    private float rotationlimit = .6f;
+    private float rotationLimit = .6f;
     [SerializeField]
-    private float jumpheight = 10.0f;
+    private float jumpHeight = 10.0f;
     [SerializeField]
-    private float glidespeed = -1.0f;
+    private float glideSpeed = -1.0f;
 
     [SerializeField] 
     private float fallMultiplier = 2.5f;
     [SerializeField] 
     private float lowJumpMultiplier = 2f;
 
-    private Vector3 movedirection, camerarelativeangle;
-    private int midairjumps = 5;
+    private Vector3 moveDirection, cameraRelativeAngle;
+    private int midairJumps = 5;
 
-    private float xinput, yinput;
-    private bool ismoving, falling, jumpinput, jump, highjump, midairjump, glideinput, pauseinput;
+    private float xInput, yInput;
+    private bool isMoving, falling, jumpInput, jump, highJump, midairJump, glideInput, pauseInput;
 
-    public bool ispaused { get; private set;} = false;
+    public bool isPaused { get; private set;} = false;
     [SerializeField] 
     private GameObject pausemenu;
 
@@ -56,16 +56,16 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        xinput = Input.GetAxis("Horizontal");
-        yinput = Input.GetAxis("Vertical");
-        jumpinput = Input.GetButtonDown("Jump");
-        pauseinput = Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.P);
+        xInput = Input.GetAxis("Horizontal");
+        yInput = Input.GetAxis("Vertical");
+        jumpInput = Input.GetButtonDown("Jump");
+        pauseInput = Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.P);
         falling = rb.velocity.y < 0;
 
-        if(pauseinput)
+        if(pauseInput)
             TogglePause();
         
-        if(!ispaused)
+        if(!isPaused)
         {
             ProcessMovement();
             
@@ -88,26 +88,26 @@ public class PlayerMovement : MonoBehaviour
 
     private void ProcessMovement()
     {
-        camerarelativeangle = xinput * cam.transform.right + yinput * cam.transform.forward;
+        cameraRelativeAngle = xInput * cam.transform.right + yInput * cam.transform.forward;
 
-        movedirection = new Vector3(camerarelativeangle.x, 0f, camerarelativeangle.z).normalized * movespeed;
+        moveDirection = new Vector3(cameraRelativeAngle.x, 0f, cameraRelativeAngle.z).normalized * moveSpeed;
 
-        rb.velocity = movedirection + Vector3.up * rb.velocity.y;
+        rb.velocity = moveDirection + Vector3.up * rb.velocity.y;
 
-        ProcessRotation(movedirection);
+        ProcessRotation(moveDirection);
         
     }
 
     private void ProcessRotation(Vector3 dir)
     {
-        ismoving = (dir.x != 0f || dir.z != 0f) && dir != Vector3.zero;
+        isMoving = (dir.x != 0f || dir.z != 0f) && dir != Vector3.zero;
 
-        dir.y *= rotationlimit;
+        dir.y *= rotationLimit;
 
-        if (ismoving){
+        if (isMoving){
             Quaternion angle = Quaternion.LookRotation(dir, Vector3.up);
 
-            Quaternion angvelocity = Quaternion.Euler(Vector3.up*rotatespeed*Time.deltaTime);
+            Quaternion angvelocity = Quaternion.Euler(Vector3.up*rotateSpeed*Time.deltaTime);
 
             rb.MoveRotation(angle*angvelocity);
             
@@ -116,30 +116,30 @@ public class PlayerMovement : MonoBehaviour
 
     private void ProcessJump()
     {
-        jump = jumpinput && ground.IsGrounded();
-        midairjump = jumpinput && !ground.IsGrounded() && midairjumps > 0;
+        jump = jumpInput && ground.IsGrounded();
+        midairJump = jumpInput && !ground.IsGrounded() && midairJumps > 0;
 
         if (jump)
         {
-            rb.velocity += Vector3.up * jumpheight;
+            rb.velocity += Vector3.up * jumpHeight;
             anim.JumpAnim();
         }
-        else if (midairjump)
+        else if (midairJump)
         {
-            rb.velocity += Vector3.up * jumpheight;
+            rb.velocity += Vector3.up * jumpHeight;
             anim.JumpAnim();
-            midairjumps--;
+            midairJumps--;
         }
     }
 
     private void ProcessGlide()
     {
-        glideinput = Input.GetButton("Jump");
+        glideInput = Input.GetButton("Jump");
 
-        if (glideinput && falling) {
+        if (glideInput && falling) {
 
             rb.mass = 0f;
-            rb.velocity = new Vector3(rb.velocity.x, glidespeed, rb.velocity.z);
+            rb.velocity = new Vector3(rb.velocity.x, glideSpeed, rb.velocity.z);
             anim.GlideAnim(true);
 
         } else {
@@ -153,7 +153,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void AdjustFall()
     {
-        highjump = rb.velocity.y > 0 && !Input.GetButton("Jump");
+        highJump = rb.velocity.y > 0 && !Input.GetButton("Jump");
 
         if (falling)
         {
@@ -161,7 +161,7 @@ public class PlayerMovement : MonoBehaviour
             rb.velocity += Vector3.up * Physics.gravity.y * (fallMultiplier - 1) * Time.deltaTime;
 
         }
-        else if (highjump)
+        else if (highJump)
         {
 
             rb.velocity += Vector3.up * Physics.gravity.y * (lowJumpMultiplier - 1) * Time.deltaTime;
@@ -171,7 +171,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void ReplenishJumps()
     {
-        midairjumps = stats.coinscollected;
+        midairJumps = stats.coinscollected;
     }
 
     public void ResetPlayer()
@@ -183,11 +183,11 @@ public class PlayerMovement : MonoBehaviour
     {
         if (Time.timeScale > 0) {
             Time.timeScale = 0;
-            ispaused = true;
+            isPaused = true;
             pausemenu.SetActive(false);
         } else if(Time.timeScale == 0) {
             Time.timeScale = 1;
-            ispaused = false;
+            isPaused = false;
             pausemenu.SetActive(true);
         }
     }

@@ -4,14 +4,14 @@ using UnityEngine;
 
 public class DeathPlane : Interactable
 {
-    [SerializeField] private float deathdelay = 1f;
+    [SerializeField] private float deathDelay = 1f;
     [SerializeField] private UIGame ui;
 
 
-    
+    // when the player touches the death plane we have to reset their position and play a transition
     public override void Interacion(GameObject player)
     {
-        new WaitForSeconds(deathdelay);
+        new WaitForSeconds(deathDelay);
         player.GetComponent<PlayerMovement>().ResetPlayer();
         ui.DeathTransition();
     }

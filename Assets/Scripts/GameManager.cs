@@ -6,8 +6,8 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
 
-    public float besttime { get; private set;}
-    public bool gamecleared { get; private set;} = false;
+    public float bestTime { get; private set;}
+    public bool gameCleared { get; private set;} = false;
 
     public static GameManager Instance { get; private set; }
 
@@ -48,19 +48,19 @@ public class GameManager : MonoBehaviour
 
     public bool SetBestTime()
     {
-        float cleartime = Time.timeSinceLevelLoad;
+        float clearTime = Time.timeSinceLevelLoad;
 
-        if(!gamecleared)
+        if(!gameCleared)
         {
-            gamecleared = true;
-            besttime = cleartime;
-            PlayerPrefs.SetFloat("BestTime", cleartime);
+            gameCleared = true;
+            bestTime = clearTime;
+            PlayerPrefs.SetFloat("BestTime", clearTime);
 
             return true;
 
-        } else if (cleartime < PlayerPrefs.GetFloat("BestTime")){
+        } else if (clearTime < PlayerPrefs.GetFloat("BestTime")){
 
-            PlayerPrefs.SetFloat("BestTime", cleartime);
+            PlayerPrefs.SetFloat("BestTime", clearTime);
             return true;
 
         } else {
@@ -73,26 +73,26 @@ public class GameManager : MonoBehaviour
     void SaveCoins()
     {
         CoinManager cm = null; //FindObjectOfType<CoinManager>();
-        CoinScript[] coins = cm.coinsinscene;
-        int total = cm.cointotal;
+        CoinScript[] coins = cm.coinsInScene;
+        int total = cm.coinTotal;
 
-        bool[] coinstracker = new bool[total];
+        bool[] coinsTracker = new bool[total];
 
         for (int i = 0; i < total; i++)
         {
             if(coins[i].gameObject.activeInHierarchy) {
-                coinstracker[i] = true;
+                coinsTracker[i] = true;
             } else {
-                coinstracker[i] = false;
+                coinsTracker[i] = false;
             }
         }
 
-        BitArray bits = new BitArray(coinstracker);
+        BitArray bits = new BitArray(coinsTracker);
         
-        int[] binconversion = new int[1];
-        bits.CopyTo(binconversion, 0);
+        int[] binConversion = new int[1];
+        bits.CopyTo(binConversion, 0);
 
-        PlayerPrefs.SetInt("CoinsCollected", binconversion[0]);
+        PlayerPrefs.SetInt("CoinsCollected", binConversion[0]);
 
         //I wont go into implementing loading as this is already quite out of scope, but this is a very optimal way of storing data such as collectables obtained
 
