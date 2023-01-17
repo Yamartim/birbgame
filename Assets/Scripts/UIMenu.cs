@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
+// ui management for the menu scene
 public class UIMenu : UIManager
 {
 

@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-
+// ui management for the game scene
 public class UIGame : UIManager
 {
 
