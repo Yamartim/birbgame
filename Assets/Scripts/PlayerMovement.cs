@@ -2,44 +2,45 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// main player class that defines movement
 public class PlayerMovement : MonoBehaviour
 {
+
+#region attributes
+
+    // components in this object
     private Rigidbody rb;
     private PlayerStats stats;
     private PlayerAnimation anim;
     private GroundCheck ground;
 
-    [SerializeField]
-    private float moveSpeed = 10.0f;
-
-    [SerializeField]
-    private float rotateSpeed = 10.0f;
-    [SerializeField]
-    private float rotationLimit = .6f;
-    [SerializeField]
-    private float jumpHeight = 10.0f;
-    [SerializeField]
-    private float glideSpeed = -1.0f;
-
-    [SerializeField] 
-    private float fallMultiplier = 2.5f;
-    [SerializeField] 
-    private float lowJumpMultiplier = 2f;
-
-    private Vector3 moveDirection, cameraRelativeAngle;
+    // physics parameters
+    [Header("Physics Parameters")]
+    [SerializeField] private float moveSpeed = 10.0f;
+    [Space]
+    [SerializeField] private float rotateSpeed = 10.0f;
+    [SerializeField] private float rotationLimit = .6f;
+    [Space]
+    [SerializeField] private float jumpHeight = 10.0f;
+    [SerializeField] private float glideSpeed = -1.0f;
+    [Space]
+    [SerializeField] private float fallMultiplier = 2.5f;
+    [SerializeField] private float lowJumpMultiplier = 2f;private Vector3 moveDirection, cameraRelativeAngle;
     private int midairJumps = 5;
 
+    // inputs and conditionals
     private float xInput, yInput;
     private bool isMoving, falling, jumpInput, jump, highJump, midairJump, glideInput, pauseInput;
 
     public bool isPaused { get; private set;} = false;
-    [SerializeField] 
-    private GameObject pausemenu;
 
-
+    // external references
+    [Header("External References")]
+    [SerializeField] private GameObject pausemenu;
     [SerializeField] private Transform LevelStart;
     [SerializeField] private Camera cam;
 
+#endregion
     
 
     // Start is called before the first frame update
@@ -56,6 +57,7 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //capturing inputs
         xInput = Input.GetAxis("Horizontal");
         yInput = Input.GetAxis("Vertical");
         jumpInput = Input.GetButtonDown("Jump");
@@ -78,6 +80,7 @@ public class PlayerMovement : MonoBehaviour
 
     }
 
+    // allows the player to jump many times again when the ground is touched
     private void OnCollisionEnter(Collision other) {
         if(ground.IsGrounded())
         {
@@ -85,7 +88,34 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    private void ReplenishJumps()
+    {
+        midairJumps = stats.coinscollected;
+    }
 
+    // return to begining functionality
+    public void ResetPlayer()
+    {
+        transform.position = LevelStart.position;
+    }
+
+    // pause functionality
+    public void TogglePause()
+    {
+        if (Time.timeScale > 0) {
+            Time.timeScale = 0;
+            isPaused = true;
+            pausemenu.SetActive(false);
+        } else if(Time.timeScale == 0) {
+            Time.timeScale = 1;
+            isPaused = false;
+            pausemenu.SetActive(true);
+        }
+    }
+
+#region movement methods
+
+    // determines player movement with input and perspective of the camera
     private void ProcessMovement()
     {
         cameraRelativeAngle = xInput * cam.transform.right + yInput * cam.transform.forward;
@@ -98,6 +128,7 @@ public class PlayerMovement : MonoBehaviour
         
     }
 
+    // rotates player towards direction they're moving to
     private void ProcessRotation(Vector3 dir)
     {
         isMoving = (dir.x != 0f || dir.z != 0f) && dir != Vector3.zero;
@@ -114,6 +145,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    // jumping and double jumping functionality
     private void ProcessJump()
     {
         jump = jumpInput && ground.IsGrounded();
@@ -132,6 +164,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    // allows the player to glide by pressing the spacebar
     private void ProcessGlide()
     {
         glideInput = Input.GetButton("Jump");
@@ -151,6 +184,7 @@ public class PlayerMovement : MonoBehaviour
 
     }
 
+    // physics adjustment so that jumping feels more responsive to player input
     private void AdjustFall()
     {
         highJump = rb.velocity.y > 0 && !Input.GetButton("Jump");
@@ -169,28 +203,6 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    private void ReplenishJumps()
-    {
-        midairJumps = stats.coinscollected;
-    }
-
-    public void ResetPlayer()
-    {
-        transform.position = LevelStart.position;
-    }
-
-    public void TogglePause()
-    {
-        if (Time.timeScale > 0) {
-            Time.timeScale = 0;
-            isPaused = true;
-            pausemenu.SetActive(false);
-        } else if(Time.timeScale == 0) {
-            Time.timeScale = 1;
-            isPaused = false;
-            pausemenu.SetActive(true);
-        }
-    }
-
+#endregion
 
 }

@@ -2,14 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// class for handling the coins the player collects
 public class PlayerStats : MonoBehaviour
 {
-    [SerializeField] CoinManager cm;
     PlayerWings wingscript;
+    [SerializeField] CoinManager cm;
 
-    public int coinstotal { get; private set;}
     [SerializeField] public int coinscollected { get; private set;} = 0;
 
+    // subscribe to the coin collection event so the player levels up accordingly
     private void OnEnable() {
         CoinScript.OnCoinCollect += AddCoin;
     }

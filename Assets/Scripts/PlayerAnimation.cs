@@ -9,7 +9,6 @@ public class PlayerAnimation : MonoBehaviour
     private GroundCheck gc;
 
 
-
     // Start is called before the first frame update
     void Start()
     {
@@ -18,7 +17,8 @@ public class PlayerAnimation : MonoBehaviour
         gc = GetComponentInChildren<GroundCheck>();
     }
 
-    // Update is called once per frame
+#region set animator parameters
+
     void FixedUpdate()
     {
         anim.SetFloat("SPEED", new Vector3(rb.velocity.x, 0f, rb.velocity.z).magnitude);
@@ -36,4 +36,7 @@ public class PlayerAnimation : MonoBehaviour
     {
         anim.SetBool("GLIDE", state);
     }
+
+#endregion
+
 }

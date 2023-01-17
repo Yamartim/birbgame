@@ -1,14 +1,15 @@
 using System.Collections;
-using System.Text;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+// class that coordinates the rest of the game
 public class GameManager : MonoBehaviour
 {
 
     public float bestTime { get; private set;}
     public bool gameCleared { get; private set;} = false;
 
+    // singleton pattern for this object to be accessible always
     public static GameManager Instance { get; private set; }
 
     private void Awake()
@@ -25,6 +26,7 @@ public class GameManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
+    // for an unused data persistance feaature
 /* 
     private void OnEnable() {
         CoinScript.OnCoinCollect += SaveCoins;
@@ -34,6 +36,7 @@ public class GameManager : MonoBehaviour
     }
  */
 
+#region scene management functions
 
     public void LoadGame()
     {
@@ -45,6 +48,10 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene(0);
     }
 
+
+#endregion
+
+#region setting player data
 
     public bool SetBestTime()
     {
@@ -98,4 +105,5 @@ public class GameManager : MonoBehaviour
 
     }
 
+#endregion
 }

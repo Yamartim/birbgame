@@ -6,6 +6,8 @@ using TMPro;
 public class UIMenu : UIManager
 {
 
+#region variables
+
     [SerializeField]
     private GameObject htpPanel;
 
@@ -14,14 +16,13 @@ public class UIMenu : UIManager
 
     private GameManager gm;
 
-
+#endregion
 
 
     // Start is called before the first frame update
     void Start()
     {
         gm = GameManager.Instance;
-
 
         if (gm.gameCleared) {
             bestTime.text = "Your best time is: " + FloatTimeToString(gm.bestTime);
@@ -30,6 +31,8 @@ public class UIMenu : UIManager
         }
         
     }
+
+#region menu button functions
 
     public void StartGame()
     {
@@ -51,6 +54,6 @@ public class UIMenu : UIManager
         Application.Quit();
     }
 
-
+#endregion
 
 }

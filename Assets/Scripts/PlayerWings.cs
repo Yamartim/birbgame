@@ -2,12 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// class for handling the wing functionality
 public class PlayerWings : MonoBehaviour
 {
     [SerializeField] Transform wingObj;
     List<GameObject> wingList;
 
-    // Start is called before the first frame update
+    // fetch a list of pairs of wings that are under this object
     void Start()
     {
         wingList = new List<GameObject>();
@@ -18,6 +19,7 @@ public class PlayerWings : MonoBehaviour
         }
     }
 
+    // this method is called when the player "levels up" and more wings are revealed
     public void UpdateWings(int currentwings, int maxwings)
     {
         if(currentwings <= maxwings) {
