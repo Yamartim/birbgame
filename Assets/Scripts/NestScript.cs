@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class NestScript : Interactable
 {
-    [SerializeField] private GameObject endpanel;
+    [SerializeField] private UIGame ui;
 
 
     public override void Interacion(GameObject p)
     {
-        GameManager.Instance.SetBestTime();
-        endpanel.SetActive(true);
+        bool gotnewrecord = GameManager.Instance.SetBestTime();
+        ui.ShowEndPanel(gotnewrecord);
     }
     
 }

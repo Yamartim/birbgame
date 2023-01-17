@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PlayerStats : MonoBehaviour
 {
+    [SerializeField] CoinManager cm;
+    PlayerWings wingscript;
 
     public int coinstotal { get; private set;}
     [SerializeField] public int coinscollected { get; private set;} = 0;
@@ -18,12 +20,14 @@ public class PlayerStats : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        coinscollected = 0; 
+        coinscollected = 0;
+        wingscript = gameObject.GetComponent<PlayerWings>();
     }
 
     public void AddCoin()
     {
         coinscollected++;
+        wingscript.UpdateWings(coinscollected, cm.cointotal);
     }
 
 }

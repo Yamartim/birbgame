@@ -70,13 +70,6 @@ public class GameManager : MonoBehaviour
     }
 
 
-    
-    public void DeathTransition()
-    {
-        Debug.Log("transition into reset");
-    }
-
-
     void SaveCoins()
     {
         CoinManager cm = null; //FindObjectOfType<CoinManager>();

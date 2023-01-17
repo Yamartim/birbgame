@@ -18,14 +18,19 @@ public class PlayerMovement : MonoBehaviour
     private float rotationlimit = .6f;
     [SerializeField]
     private float jumpheight = 10.0f;
+    [SerializeField]
+    private float glidespeed = -1.0f;
 
     [SerializeField] 
     private float fallMultiplier = 2.5f;
     [SerializeField] 
     private float lowJumpMultiplier = 2f;
 
-    private Vector3 movedirection, camerarelative;
+    private Vector3 movedirection, camerarelativeangle;
     private int midairjumps = 5;
+
+    private float xinput, yinput;
+    private bool ismoving, falling, jumpinput, jump, highjump, midairjump, glideinput, pauseinput;
 
     public bool ispaused { get; private set;} = false;
     [SerializeField] 
@@ -51,26 +56,27 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.P))
+        xinput = Input.GetAxis("Horizontal");
+        yinput = Input.GetAxis("Vertical");
+        jumpinput = Input.GetButtonDown("Jump");
+        pauseinput = Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.P);
+        falling = rb.velocity.y < 0;
+
+        if(pauseinput)
             TogglePause();
         
         if(!ispaused)
         {
-            rb.velocity = ProcessMovement();
+            ProcessMovement();
+            
+            ProcessJump();
 
-            if(rb.velocity.y < 0){
+            ProcessGlide();
 
-                rb.velocity += Vector3.up * Physics.gravity.y * (fallMultiplier - 1) * Time.deltaTime;
-
-            } else if(rb.velocity.y > 0 && !Input.GetButton("Jump")){
-
-                rb.velocity += Vector3.up * Physics.gravity.y * (lowJumpMultiplier - 1) * Time.deltaTime;
-
-            }
+            AdjustFall();
         }
 
     }
-
 
     private void OnCollisionEnter(Collision other) {
         if(ground.IsGrounded())
@@ -80,41 +86,86 @@ public class PlayerMovement : MonoBehaviour
     }
 
 
-    private Vector3 ProcessMovement()
+    private void ProcessMovement()
     {
-        bool willjump = Input.GetButtonDown("Jump") && ground.IsGrounded();
-        bool willmidairjump = Input.GetButtonDown("Jump") && !ground.IsGrounded() && midairjumps > 0;
-        
-        //movedirection = new Vector3(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical")).normalized * movespeed + Vector3.up * rb.velocity.y;
-        camerarelative = Input.GetAxis("Horizontal") * cam.transform.right + Input.GetAxis("Vertical") * cam.transform.forward;
-        movedirection =  new Vector3(camerarelative.x, 0f, camerarelative.z).normalized * movespeed + Vector3.up * rb.velocity.y;
-    
+        camerarelativeangle = xinput * cam.transform.right + yinput * cam.transform.forward;
+
+        movedirection = new Vector3(camerarelativeangle.x, 0f, camerarelativeangle.z).normalized * movespeed;
+
+        rb.velocity = movedirection + Vector3.up * rb.velocity.y;
+
         ProcessRotation(movedirection);
-
-        if (willjump){
-            movedirection.y += jumpheight;
-            anim.JumpAnim();
-
-        } else if (willmidairjump){
-            movedirection.y += jumpheight;
-            midairjumps --;
-            anim.JumpAnim();
-        }
-
-        return movedirection;
+        
     }
 
     private void ProcessRotation(Vector3 dir)
     {
+        ismoving = (dir.x != 0f || dir.z != 0f) && dir != Vector3.zero;
+
         dir.y *= rotationlimit;
 
-        if ((dir.x != 0f || dir.z != 0f) && dir != Vector3.zero){
+        if (ismoving){
             Quaternion angle = Quaternion.LookRotation(dir, Vector3.up);
 
             Quaternion angvelocity = Quaternion.Euler(Vector3.up*rotatespeed*Time.deltaTime);
 
             rb.MoveRotation(angle*angvelocity);
             
+        }
+    }
+
+    private void ProcessJump()
+    {
+        jump = jumpinput && ground.IsGrounded();
+        midairjump = jumpinput && !ground.IsGrounded() && midairjumps > 0;
+
+        if (jump)
+        {
+            rb.velocity += Vector3.up * jumpheight;
+            anim.JumpAnim();
+        }
+        else if (midairjump)
+        {
+            rb.velocity += Vector3.up * jumpheight;
+            anim.JumpAnim();
+            midairjumps--;
+        }
+    }
+
+    private void ProcessGlide()
+    {
+        glideinput = Input.GetButton("Jump");
+
+        if (glideinput && falling) {
+
+            rb.mass = 0f;
+            rb.velocity = new Vector3(rb.velocity.x, glidespeed, rb.velocity.z);
+            anim.GlideAnim(true);
+
+        } else {
+
+            rb.mass = 1f;
+            anim.GlideAnim(false);
+
+        }
+
+    }
+
+    private void AdjustFall()
+    {
+        highjump = rb.velocity.y > 0 && !Input.GetButton("Jump");
+
+        if (falling)
+        {
+
+            rb.velocity += Vector3.up * Physics.gravity.y * (fallMultiplier - 1) * Time.deltaTime;
+
+        }
+        else if (highjump)
+        {
+
+            rb.velocity += Vector3.up * Physics.gravity.y * (lowJumpMultiplier - 1) * Time.deltaTime;
+
         }
     }
 
@@ -125,12 +176,7 @@ public class PlayerMovement : MonoBehaviour
 
     public void ResetPlayer()
     {
-        GameManager.Instance.DeathTransition();
-
-        new WaitForSeconds(1f);
-
         transform.position = LevelStart.position;
-
     }
 
     public void TogglePause()

@@ -10,7 +10,7 @@ public class UIGame : UIManager
 
 
     [SerializeField] private CoinManager cm;
-    [SerializeField] private GameObject coindisplay, coinprefab, pausepanel, endpanel; 
+    [SerializeField] private GameObject coindisplay, coinprefab, pausepanel, endpanel, transitionobj; 
     [SerializeField] private Image[] coinimgs;
 
     GameManager gm;
@@ -78,6 +78,12 @@ public class UIGame : UIManager
         if(newrecord){
             resulttext.text += "\nNEW RECORD";
         }
+    }
+
+    public void DeathTransition()
+    {
+        transitionobj.GetComponent<Animator>().SetTrigger("START");
+        //transitionobj.GetComponent<Animator>().SetTrigger("END");
     }
 
 }
