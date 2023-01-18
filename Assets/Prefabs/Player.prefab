@@ -3634,7 +3634,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fdd4ba3dcc6e8454ca3d0fadea84df3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  groundlayer:
+  checkRadius: 0.1
+  groundLayer:
     serializedVersion: 2
     m_Bits: 8
 --- !u!1 &7258027512248580525
@@ -3951,7 +3952,7 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.3
+  m_Radius: 0.35
   m_Height: 1.29
   m_Direction: 1
   m_Center: {x: 0, y: -0.28, z: 0}
@@ -3983,11 +3984,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78961ee84f607214cba9db56d5c0c041, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movespeed: 10
-  rotatespeed: 10
-  rotationlimit: 0.6
-  jumpheight: 10
-  glidespeed: -1
+  moveSpeed: 10
+  rotateSpeed: 10
+  rotationLimit: 0.6
+  jumpHeight: 10
+  glideSpeed: -1
   fallMultiplier: 2.5
   lowJumpMultiplier: 2
   pausemenu: {fileID: 0}
@@ -4030,7 +4031,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31c6f2d3e665f434fb8de087e29bcaf4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  wingobj: {fileID: 7258027512421660063}
+  wingObj: {fileID: 7258027512421660063}
 --- !u!95 &6278950310729753154
 Animator:
   serializedVersion: 3

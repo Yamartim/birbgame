@@ -12,10 +12,11 @@ public class UIGame : UIManager
 
     [SerializeField] private CoinManager cm;
     [SerializeField] private GameObject coinDisplay, coinPrefab, pausePanel, endPanel, transitionObj; 
+    [SerializeField] private TMP_Text resultText;
+    
     [SerializeField] private Image[] coinImgs;
 
     [SerializeField] private TMP_Text timerDisplay;
-    [SerializeField] private TMP_Text resultText;
 
     
 #endregion

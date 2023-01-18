@@ -30,7 +30,8 @@ public class PlayerMovement : MonoBehaviour
 
     // inputs and conditionals
     private float xInput, yInput;
-    private bool isMoving, falling, jumpInput, jump, highJump, midairJump, glideInput, pauseInput;
+    private bool jumpInput, pauseInput, falling;
+    
 
     public bool isPaused { get; private set;} = false;
 
@@ -118,11 +119,14 @@ public class PlayerMovement : MonoBehaviour
     // determines player movement with input and perspective of the camera
     private void ProcessMovement()
     {
+        //projecting input vector into camera rotation vector for camera relative movement
         cameraRelativeAngle = xInput * cam.transform.right + yInput * cam.transform.forward;
 
+        //normalized for the speed to be constant, neutralizing the y rotation, apply speed parameter
         moveDirection = new Vector3(cameraRelativeAngle.x, 0f, cameraRelativeAngle.z).normalized * moveSpeed;
 
-        rb.velocity = moveDirection + Vector3.up * rb.velocity.y;
+        //apply values without affecting vertical velocity
+        rb.velocity = new Vector3(moveDirection.x, rb.velocity.y, moveDirection.z);
 
         ProcessRotation(moveDirection);
         
@@ -131,16 +135,18 @@ public class PlayerMovement : MonoBehaviour
     // rotates player towards direction they're moving to
     private void ProcessRotation(Vector3 dir)
     {
-        isMoving = (dir.x != 0f || dir.z != 0f) && dir != Vector3.zero;
+        Quaternion angle, angleVelocity;
+
+        bool isMoving = (dir.x != 0f || dir.z != 0f) && dir != Vector3.zero && (xInput != 0f || yInput != 0);
 
         dir.y *= rotationLimit;
 
         if (isMoving){
-            Quaternion angle = Quaternion.LookRotation(dir, Vector3.up);
+            angle = Quaternion.LookRotation(dir, Vector3.up);
 
-            Quaternion angvelocity = Quaternion.Euler(Vector3.up*rotateSpeed*Time.deltaTime);
+            angleVelocity = Quaternion.Euler(Vector3.up * rotateSpeed * Time.deltaTime);
 
-            rb.MoveRotation(angle*angvelocity);
+            rb.MoveRotation(angle*angleVelocity);
             
         }
     }
@@ -148,8 +154,9 @@ public class PlayerMovement : MonoBehaviour
     // jumping and double jumping functionality
     private void ProcessJump()
     {
-        jump = jumpInput && ground.IsGrounded();
-        midairJump = jumpInput && !ground.IsGrounded() && midairJumps > 0;
+        bool grounded = ground.IsGrounded();
+        bool jump = jumpInput && grounded;
+        bool midairJump = jumpInput && !grounded && midairJumps > 0;
 
         if (jump)
         {
@@ -167,17 +174,17 @@ public class PlayerMovement : MonoBehaviour
     // allows the player to glide by pressing the spacebar
     private void ProcessGlide()
     {
-        glideInput = Input.GetButton("Jump");
+        bool glideInput = Input.GetButton("Jump");
 
         if (glideInput && falling) {
 
-            rb.mass = 0f;
+            rb.useGravity = false;
             rb.velocity = new Vector3(rb.velocity.x, glideSpeed, rb.velocity.z);
             anim.GlideAnim(true);
 
         } else {
 
-            rb.mass = 1f;
+            rb.useGravity = true;
             anim.GlideAnim(false);
 
         }
@@ -187,7 +194,7 @@ public class PlayerMovement : MonoBehaviour
     // physics adjustment so that jumping feels more responsive to player input
     private void AdjustFall()
     {
-        highJump = rb.velocity.y > 0 && !Input.GetButton("Jump");
+        bool highJump = rb.velocity.y > 0 && !Input.GetButton("Jump");
 
         if (falling)
         {
