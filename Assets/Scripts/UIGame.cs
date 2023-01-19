@@ -59,7 +59,7 @@ public class UIGame : UIManager
     {
         for (int i = 0; i<cm.coinTotal; i++)
         {
-            if(cm.coinsInScene[i].gameObject.activeInHierarchy){
+            if(cm.coinsInScene[i].collected){
                 coinImgs[i].color = Color.yellow;
             } else {
                 coinImgs[i].color = Color.gray;

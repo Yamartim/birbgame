@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,6 +14,10 @@ public class PlayerMovement : MonoBehaviour
     private PlayerStats stats;
     private PlayerAnimation anim;
     private GroundCheck ground;
+    private AudioSource flapSound;
+    private ParticleSystem dustFx;
+    private ParticleSystem.MainModule dustMain;
+    private ParticleSystem.ShapeModule dustShape;
 
     // physics parameters
     [Header("Physics Parameters")]
@@ -30,7 +35,7 @@ public class PlayerMovement : MonoBehaviour
 
     // inputs and conditionals
     private float xInput, yInput;
-    private bool jumpInput, pauseInput, falling;
+    private bool jumpInput, pauseInput, falling, grounded;
     
 
     public bool isPaused { get; private set;} = false;
@@ -50,7 +55,11 @@ public class PlayerMovement : MonoBehaviour
         rb = gameObject.GetComponent<Rigidbody>();
         stats = gameObject.GetComponent<PlayerStats>();
         anim = gameObject.GetComponent<PlayerAnimation>();
+        flapSound = gameObject.GetComponent<AudioSource>();
         ground = gameObject.GetComponentInChildren<GroundCheck>();
+        dustFx = gameObject.GetComponentInChildren<ParticleSystem>();
+        dustMain = dustFx.main;
+        dustShape = dustFx.shape;
 
         ReplenishJumps();
     }
@@ -64,6 +73,7 @@ public class PlayerMovement : MonoBehaviour
         jumpInput = Input.GetButtonDown("Jump");
         pauseInput = Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.P);
         falling = rb.velocity.y < 0;
+        grounded = ground.IsGrounded();
 
         if(pauseInput)
             TogglePause();
@@ -77,13 +87,15 @@ public class PlayerMovement : MonoBehaviour
             ProcessGlide();
 
             AdjustFall();
+
         }
 
     }
 
+
     // allows the player to jump many times again when the ground is touched
     private void OnCollisionEnter(Collision other) {
-        if(ground.IsGrounded())
+        if(grounded)
         {
             ReplenishJumps();
         }
@@ -97,13 +109,15 @@ public class PlayerMovement : MonoBehaviour
     // return to begining functionality
     public void ResetPlayer()
     {
+        rb.velocity = Vector3.zero;
         transform.position = LevelStart.position;
     }
 
     // pause functionality
     public void TogglePause()
     {
-        if (Time.timeScale > 0) {
+        if (Time.timeScale > 0) 
+        {
             Time.timeScale = 0;
             isPaused = true;
             pausemenu.SetActive(false);
@@ -129,7 +143,7 @@ public class PlayerMovement : MonoBehaviour
         rb.velocity = new Vector3(moveDirection.x, rb.velocity.y, moveDirection.z);
 
         ProcessRotation(moveDirection);
-        
+        MovementParticles();
     }
 
     // rotates player towards direction they're moving to
@@ -141,7 +155,8 @@ public class PlayerMovement : MonoBehaviour
 
         dir.y *= rotationLimit;
 
-        if (isMoving){
+        if (isMoving)
+        {
             angle = Quaternion.LookRotation(dir, Vector3.up);
 
             angleVelocity = Quaternion.Euler(Vector3.up * rotateSpeed * Time.deltaTime);
@@ -154,7 +169,6 @@ public class PlayerMovement : MonoBehaviour
     // jumping and double jumping functionality
     private void ProcessJump()
     {
-        bool grounded = ground.IsGrounded();
         bool jump = jumpInput && grounded;
         bool midairJump = jumpInput && !grounded && midairJumps > 0;
 
@@ -162,11 +176,16 @@ public class PlayerMovement : MonoBehaviour
         {
             rb.velocity += Vector3.up * jumpHeight;
             anim.JumpAnim();
+            JumpParticles();
+            flapSound.Play();
         }
         else if (midairJump)
         {
+            // normally id put these tree repeated lines in a function but i wanted to add changes to the jump physics and animations eventually so I chose to leave it hear to be easy to change later
             rb.velocity += Vector3.up * jumpHeight;
             anim.JumpAnim();
+            JumpParticles();
+            flapSound.Play();
             midairJumps--;
         }
     }
@@ -176,7 +195,8 @@ public class PlayerMovement : MonoBehaviour
     {
         bool glideInput = Input.GetButton("Jump");
 
-        if (glideInput && falling) {
+        if (glideInput && falling && !jumpInput) 
+        {
 
             rb.useGravity = false;
             rb.velocity = new Vector3(rb.velocity.x, glideSpeed, rb.velocity.z);
@@ -211,5 +231,40 @@ public class PlayerMovement : MonoBehaviour
     }
 
 #endregion
+
+
+#region particle methods
+
+    private void MovementParticles()
+    {
+        if((xInput != 0 || yInput != 0) && grounded && !dustFx.isPlaying )
+        {
+            dustFx.Play();
+
+        } else 
+        {
+            dustFx.Stop();
+        }
+    }
+
+    private void JumpParticles()
+    {
+        if (jumpInput && grounded){
+            dustMain.startSpeed = 2f;
+            dustShape.randomDirectionAmount = 1f;
+            //ParticleSystem.EmitParams jumpemit = new ParticleSystem.EmitParams();
+            //jumpemit.velocity = Vector3.forward * 5f;
+            
+            //dustFx.Emit(jumpemit, 20);
+            dustFx.Play();
+        } else
+        {
+            dustMain.startSpeed = .4f;
+            dustShape.randomDirectionAmount = .1f;
+        }
+    }
+    
+#endregion
+
 
 }
