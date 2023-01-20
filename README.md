@@ -6,7 +6,7 @@ You are a small bird and you gotta climb the mountain to reach your nest! Explor
 
 > Design and implement a Unity app containing a single mini game that distracts the user during a painful procedure, with a focus towards children.
 
-You can play it on Windows by cloning the repository and executing the file `Builds/0.1.4/birbgame.exe` however I'd recommend playing straight from the unity editor (version 2020.3.18f1) as there are some very weird bugs on the build version that make it hard to play... (a mouse and keyboard or a gamepad are required to play)
+You can play it on Windows by cloning the repository and executing the file `Builds/0.1.4/birbgame.exe` however I'd recommend playing straight from the unity editor (version 2020.3.18f1) as there are some very weird bugs on the build version that make it hard to play... (a keyboard or a gamepad are required to play)
 
 ## Design Process
 
