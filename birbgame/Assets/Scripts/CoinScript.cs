@@ -14,14 +14,14 @@ public class CoinScript : Interactable
 
     private MeshRenderer mesh;
     private CapsuleCollider coll;
-    private new Light light;
+    private Light plight;
     private ParticleSystem coinSparkle;
     private AudioSource collectSound;
 
     private void Start() {
         mesh = GetComponent<MeshRenderer>();
         coll = GetComponent<CapsuleCollider>();
-        light = GetComponentInChildren<Light>();
+        plight = GetComponentInChildren<Light>();
         collectSound = GetComponentInChildren<AudioSource>();
         coinSparkle = GetComponentInChildren<ParticleSystem>();
     }
@@ -32,7 +32,7 @@ public class CoinScript : Interactable
 
         mesh.enabled = false;
         coll.enabled = false;
-        light.enabled = false;
+        plight.enabled = false;
         collectSound.Play();
         coinSparkle.Play();
         OnCoinCollect?.Invoke(); //the question mark identifies if the event exists first

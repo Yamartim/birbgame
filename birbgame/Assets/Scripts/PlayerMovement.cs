@@ -30,7 +30,10 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float glideSpeed = -1.0f;
     [Space]
     [SerializeField] private float fallMultiplier = 2.5f;
-    [SerializeField] private float lowJumpMultiplier = 2f;private Vector3 moveDirection, cameraRelativeAngle;
+    [SerializeField] private float lowJumpMultiplier = 2f;
+    private Vector3 inputVector, moveDirection;
+    private Quaternion camAngle;
+
     private int midairJumps = 5;
 
     // inputs and conditionals
@@ -44,7 +47,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("External References")]
     [SerializeField] private GameObject pausemenu;
     [SerializeField] private Transform LevelStart;
-    [SerializeField] private Camera cam;
+    private Camera cam;
 
 #endregion
     
@@ -57,10 +60,12 @@ public class PlayerMovement : MonoBehaviour
         anim = gameObject.GetComponent<PlayerAnimation>();
         flapSound = gameObject.GetComponent<AudioSource>();
         ground = gameObject.GetComponentInChildren<GroundCheck>();
+        cam = Camera.main;
         dustFx = gameObject.GetComponentInChildren<ParticleSystem>();
         dustMain = dustFx.main;
         dustShape = dustFx.shape;
 
+        isPaused = false;
         ReplenishJumps();
     }
 
@@ -120,11 +125,11 @@ public class PlayerMovement : MonoBehaviour
         {
             Time.timeScale = 0;
             isPaused = true;
-            pausemenu.SetActive(false);
+            pausemenu.SetActive(true);
         } else if(Time.timeScale == 0) {
             Time.timeScale = 1;
             isPaused = false;
-            pausemenu.SetActive(true);
+            pausemenu.SetActive(false);
         }
     }
 
@@ -133,14 +138,23 @@ public class PlayerMovement : MonoBehaviour
     // determines player movement with input and perspective of the camera
     private void ProcessMovement()
     {
-        //projecting input vector into camera rotation vector for camera relative movement
-        cameraRelativeAngle = xInput * cam.transform.right + yInput * cam.transform.forward;
+        //attempt to solve a bug
+        //float camEuler = Camera.main.transform.eulerAngles.y;
 
-        //normalized for the speed to be constant, neutralizing the y rotation, apply speed parameter
-        moveDirection = new Vector3(cameraRelativeAngle.x, 0f, cameraRelativeAngle.z).normalized * moveSpeed;
+        //normalized for the speed to be constant, neutralizing the y rotation
+        inputVector = new Vector3(xInput, 0f, yInput).normalized;
 
-        //apply values without affecting vertical velocity
-        rb.velocity = new Vector3(moveDirection.x, rb.velocity.y, moveDirection.z);
+        //getting camera angle for relative movement
+        camAngle = Quaternion.Euler(0f, cam.transform.eulerAngles.y, 0f);
+
+        //final direction vector
+        moveDirection = camAngle * inputVector;
+
+
+        //turning direction and speed into movement without affecting vertical velocity
+        rb.velocity = moveDirection*moveSpeed + Vector3.up*rb.velocity.y;
+        //alternative:
+        //rb.velocity = new Vector3(moveDirection.x*moveSpeed, rb.velocity.y, moveDirection.z*moveSpeed);
 
         ProcessRotation(moveDirection);
         MovementParticles();
